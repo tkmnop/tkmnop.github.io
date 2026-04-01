@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Portfolio | Environmental Interface</title>
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --text-main: #111111;
+            --text-muted: #777777;
+            --border-ui: #eeeeee;
+            --weather-bg: #ffffff; 
+        }
+
+        body, html { margin: 0; padding: 0; font-family: "Inter", -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-main); }
+
+        /* NAV - McGillick Style */
+        nav { display: flex; border-bottom: 1px solid var(--border-ui); position: sticky; top: 0; background: white; z-index: 1000; }
+        nav a { padding: 1.2rem 1.8rem; text-decoration: none; color: var(--text-main); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08rem; border-right: 1px solid var(--border-ui); cursor: pointer; transition: 0.2s; }
+        nav a:hover { background: #f9f9f9; }
+
+        /* HOME - Environmental Interface */
+        #home { height: calc(100vh - 60px); display: flex; align-items: center; padding: 0 10%; background-color: var(--weather-bg); transition: background-color 2s ease; }
+        .hero-box { max-width: 550px; border-left: 2px solid var(--text-main); padding-left: 2rem; }
+        
+        /* CONTENT SECTIONS */
+        section { padding: 4rem 10%; display: none; }
+        .active { display: block; }
+
+        /* ARCHIVE LIST - Rickard Style */
+        .archive-list { max-width: 700px; margin-top: 2rem; }
+        .archive-item { display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #f5f5f5; text-decoration: none; color: inherit; transition: opacity 0.2s; }
+        .archive-item:hover { opacity: 0.6; }
+        .archive-title { font-weight: 400; flex: 1; }
+        .archive-date { color: var(--text-muted); font-family: monospace; font-size: 0.9rem; margin-left: 2rem; }
+        
+        h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: 0.1rem; margin-bottom: 2rem; color: var(--text-muted); }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a onclick="showPage('home')">Home</a>
+        <a onclick="showPage('posts')">Posts</a>
+        <a onclick="showPage('interactive')">Interactive</a>
+    </nav>
+
+    <section id="home" class="active">
+        <div class="hero-box">
+            <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Interface 01</h1>
+            <p>Atmospheric data translated to color. A silent reflection of external conditions.</p>
+            <p id="weather-label" style="font-family: monospace; font-size: 0.75rem; margin-top: 2rem; color: var(--text-muted);">AWAITING SENSOR DATA...</p>
+        </div>
+    </section>
+
+    <section id="posts">
+        <h2>Writing & Research</h2>
+        <div class="archive-list" id="post-container">
+            <script>
+                const postContainer = document.currentScript.parentElement;
+                for(let i=1; i<=20; i++) {
+                    postContainer.innerHTML += `
+                    <a href="#" class="archive-item">
+                        <span class="archive-title">Research Essay Title ${21-i}</span>
+                        <span class="archive-date">2026-04-${i < 10 ? '0'+i : i}</span>
+                    </a>`;
+                }
+            </script>
+        </div>
+    </section>
+
+    <section id="interactive">
+        <h2>Computational Experiments</h2>
+        <div class="archive-list" id="int-container">
+            <script>
+                const intContainer = document.currentScript.parentElement;
+                for(let i=1; i<=10; i++) {
+                    intContainer.innerHTML += `
+                    <a href="#" class="archive-item">
+                        <span class="archive-title">Experimental Protocol 0${i}</span>
+                        <span class="archive-date">LAB_RUN_0${i}</span>
+                    </a>`;
+                }
+            </script>
+        </div>
+    </section>
+
+    <script>
+        // ROUTING
+        function showPage(id) {
+            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        // WEATHER SENSOR
+        // PASTE YOUR KEY INSIDE THE QUOTES BELOW
+        const apiKey = 'YOUR_API_KEY_HERE'; 
+
+        function updateEnvironment(lat, lon) {
+            fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`)
+                .then(r => r.json())
+                .then(data => {
+                    const main = data.weather[0].main.toLowerCase();
+                    const label = document.getElementById('weather-label');
+                    const home = document.getElementById('home');
+                    
+                    if (main.includes('clear')) {
+                        home.style.backgroundColor = "#FFF9C4"; // Academic Yellow
+                        label.innerText = `STATUS: SUNNY / LOCATION: ${data.name.toUpperCase()}`;
+                    } else {
+                        home.style.backgroundColor = "#E1F5FE"; // Academic Blue
+                        label.innerText = `STATUS: OVERCAST / LOCATION: ${data.name.toUpperCase()}`;
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('weather-label').innerText = "STATUS: OFFLINE / USING NEUTRAL INTERFACE";
+                });
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(p => updateEnvironment(p.coords.latitude, p.coords.longitude));
+        }
+    </script>
+</body>
+</html>

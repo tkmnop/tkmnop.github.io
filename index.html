@@ -12,14 +12,14 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: #fff;
             color: #111;
-            overflow: hidden; /* Prevents global scrolling */
+            overflow: hidden; 
         }
 
         .layout { display: flex; height: 100vh; width: 100vw; }
 
-        /* --- SIDEBAR (McGillick Style: No Title) --- */
+        /* --- SIDEBAR (McGillick Style) --- */
         nav.sidebar {
-            width: 240px;
+            width: 220px;
             height: 100%;
             border-right: 1px solid #eee;
             padding: 3rem 2rem;
@@ -27,92 +27,107 @@
             flex-direction: column;
             gap: 1.2rem;
             flex-shrink: 0;
+            background: #fff;
+            z-index: 10;
         }
 
         nav.sidebar a {
             text-decoration: none;
-            color: #999;
-            font-size: 0.85rem;
+            color: #aaa;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 0.1rem;
+            letter-spacing: 0.12rem;
             cursor: pointer;
-            transition: 0.2s;
+            transition: color 0.2s;
         }
 
         nav.sidebar a.active { color: #111; font-weight: 600; }
 
-        /* --- MAIN CONTENT AREA --- */
+        /* --- CONTENT CONTAINER --- */
         main {
             flex-grow: 1;
             height: 100%;
-            overflow-y: auto; /* Content scrolls, sidebar stays */
+            overflow-y: auto; 
             position: relative;
         }
 
-        section { display: none; min-height: 100%; }
+        /* Essential: This ensures sections don't stack or peek through */
+        section { 
+            display: none; 
+            width: 100%;
+            min-height: 100%; 
+            background: #fff; 
+        }
+        
         section.active { display: block; }
 
-        /* --- HOME: THE SMART SCREEN (No Scrolling) --- */
+        /* --- HOME: ENVIRONMENTAL INTERFACE --- */
+        #home.active { display: flex; } /* Flex for centering */
         #home {
             height: 100vh;
-            width: 100%;
-            display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             transition: background-color 2s ease;
-            position: relative;
-            overflow: hidden; /* Strictly no scrolling */
+            overflow: hidden; 
+            text-align: center;
+            padding: 0 5%;
         }
 
-        #weather-statement { font-size: 2.5rem; font-weight: 300; letter-spacing: -0.02em; }
+        #weather-statement { 
+            font-size: 3.5rem; 
+            font-weight: 300; 
+            letter-spacing: -0.03em; 
+            margin-bottom: 1rem;
+        }
         
         .algo-desc {
             position: absolute;
-            bottom: 2rem;
-            max-width: 400px;
-            text-align: center;
-            font-size: 0.75rem;
-            color: rgba(0,0,0,0.4);
-            line-height: 1.5;
-            padding: 0 20px;
+            bottom: 3rem;
+            width: 90%;
+            max-width: 1000px; /* Wide to prevent wrapping */
+            font-size: 0.8rem;
+            color: rgba(0,0,0,0.5);
+            line-height: 1.6;
+            letter-spacing: 0.02em;
         }
 
         /* --- POSTS & INTERACTIVE (Rickard Style) --- */
-        .page-container { padding: 4rem 8%; max-width: 900px; }
+        .page-container { padding: 4rem 10%; max-width: 1000px; }
         
-        /* Sub-Nav for Categories */
         .sub-nav {
             display: flex;
             gap: 1.5rem;
-            margin-bottom: 3rem;
+            margin-bottom: 3.5rem;
             border-bottom: 1px solid #eee;
             padding-bottom: 1rem;
         }
 
         .sub-nav span {
-            font-size: 0.8rem;
-            color: #999;
+            font-size: 0.75rem;
+            color: #aaa;
             cursor: pointer;
             text-transform: lowercase;
+            letter-spacing: 0.05em;
         }
 
-        .sub-nav span:hover, .sub-nav span.active { color: #111; text-decoration: underline; }
+        .sub-nav span.active, .sub-nav span:hover { color: #111; }
 
-        /* Archive Listing */
+        /* Archive Items */
         .archive-item {
             display: flex;
-            gap: 2rem;
-            padding: 0.6rem 0;
+            padding: 0.7rem 0;
             text-decoration: none;
             color: inherit;
             font-size: 0.95rem;
-            border-bottom: 1px solid #fafafa;
+            border-bottom: 1px solid #f9f9f9;
         }
 
-        .archive-item:hover .title { text-decoration: underline; }
-        .date { color: #bbb; font-family: monospace; width: 80px; flex-shrink: 0; }
+        .archive-item:hover .title { color: #666; }
+        .date { color: #ccc; font-family: monospace; width: 100px; flex-shrink: 0; font-size: 0.85rem; }
         .title { flex-grow: 1; }
+
+        h2 { font-size: 0.7rem; text-transform: uppercase; color: #bbb; letter-spacing: 0.2rem; margin-bottom: 2.5rem; }
 
     </style>
 </head>
@@ -120,7 +135,7 @@
 
     <div class="layout">
         <nav class="sidebar">
-            <a onclick="route('home')" id="nav-home">Home</a>
+            <a onclick="route('home')" id="nav-home" class="active">Home</a>
             <a onclick="route('posts')" id="nav-posts">Posts</a>
             <a onclick="route('interactive')" id="nav-interactive">Interactive</a>
         </nav>
@@ -128,9 +143,10 @@
         <main id="main-content">
             
             <section id="home" class="active">
-                <h1 id="weather-statement">Analyzing environment...</h1>
+                <h1 id="weather-statement">Syncing...</h1>
                 <div class="algo-desc">
-                    This interface functions as a real-time environmental sensor. By translating regional meteorological data into a minimal color field, it bridges the gap between digital space and physical atmosphere.
+                    This interface translates local meteorological data into a visual spectrum: yellow signifies solar clarity and clear skies, 
+                    while blue represents atmospheric density and overcast conditions.
                 </div>
             </section>
 
@@ -144,15 +160,14 @@
                         <span>reviews</span>
                         <span>misc</span>
                     </div>
-                    <div id="posts-list">
-                        </div>
+                    <div id="posts-list"></div>
                 </div>
             </section>
 
             <section id="interactive">
                 <div class="page-container">
-                    <div id="int-list">
-                        </div>
+                    <h2>Experiments & Prototypes</h2>
+                    <div id="int-list"></div>
                 </div>
             </section>
 
@@ -160,47 +175,49 @@
     </div>
 
     <script>
-        // 1. NAVIGATION & ROUTING
+        // 1. ROUTING LOGIC
         function route(id) {
-            // Update Visibility
+            // Hide all
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+            // Show target
             document.getElementById(id).classList.add('active');
 
-            // Update Sidebar UI
+            // Update Nav Style
             document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
             document.getElementById('nav-' + id).classList.add('active');
 
-            // Reset Scroll position
+            // Reset scroll for the new page
             document.getElementById('main-content').scrollTop = 0;
         }
 
-        // 2. DATA GENERATION (Placeholders)
+        // 2. DATA LOAD (Descending Order: Most Recent Top)
         function loadContent() {
             const postsList = document.getElementById('posts-list');
             const intList = document.getElementById('int-list');
 
-            // Generate 20 Posts (Format: 26-01-20)
-            for(let i=1; i<=20; i++) {
+            // Posts: 20 items (Date 26-04-20 to 26-04-01)
+            for(let i=20; i>=1; i--) {
+                const day = i < 10 ? '0'+i : i;
                 postsList.innerHTML += `
-                <a href="your-post-link-here.html" class="archive-item">
-                    <span class="date">26-04-${i < 10 ? '0'+i : i}</span>
-                    <span class="title">Sample Academic Research Paper Title ${21-i}</span>
+                <a href="#" class="archive-item">
+                    <span class="date">${day}-04-26</span>
+                    <span class="title">Paper Title ${i}</span>
                 </a>`;
             }
 
-            // Generate 10 Interactive
-            for(let i=1; i<=10; i++) {
+            // Interactive: 10 items
+            for(let i=10; i>=1; i--) {
+                const day = i < 10 ? '0'+i : i;
                 intList.innerHTML += `
-                <a href="your-interactive-link.html" class="archive-item">
-                    <span class="date">26-04-${i < 10 ? '0'+i : i}</span>
-                    <span class="title">Interactive Data Visualization Experiment ${i}</span>
+                <a href="#" class="archive-item">
+                    <span class="date">${day}-04-26</span>
+                    <span class="title">Interactive Experiment ${i}</span>
                 </a>`;
             }
         }
         loadContent();
 
-        // 3. WEATHER ALGORITHM
-        // PASTE YOUR KEY HERE
+        // 3. WEATHER SENSOR
         const apiKey = 'c879a68af9adfd66fee980f91922a692'; 
 
         function setEnvironment(lat, lon) {
@@ -212,20 +229,20 @@
                     const text = document.getElementById('weather-statement');
 
                     if (weather.includes('clear')) {
-                        home.style.backgroundColor = "#FFF176"; // Direct Sunny Yellow
-                        text.innerText = "It is sunny.";
+                        home.style.backgroundColor = "#FFEB3B"; 
+                        text.innerText = "Atmosphere: Clear";
                         text.style.color = "#111";
-                    } else if (weather.includes('cloud') || weather.includes('rain') || weather.includes('drizzle')) {
-                        home.style.backgroundColor = "#1E88E5"; // Direct Gloomy Blue
-                        text.innerText = "It is gloomy.";
+                    } else if (weather.includes('cloud') || weather.includes('rain')) {
+                        home.style.backgroundColor = "#1E88E5"; 
+                        text.innerText = "Atmosphere: Overcast";
                         text.style.color = "#fff";
                     } else {
-                        home.style.backgroundColor = "#f0f0f0";
-                        text.innerText = "The air is neutral.";
+                        home.style.backgroundColor = "#fff";
+                        text.innerText = "Atmosphere: Neutral";
                     }
                 })
                 .catch(() => {
-                    document.getElementById('weather-statement').innerText = "Environment Offline.";
+                    document.getElementById('weather-statement').innerText = "System Offline";
                 });
         }
 

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portfolio | Academic Archive</title>
     <style>
-        /* --- CORE SYSTEM --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html { 
             height: 100%; 
@@ -14,67 +13,32 @@
             color: #111;
             overflow: hidden; 
         }
-
         .layout { display: flex; height: 100vh; width: 100vw; }
-
-        /* --- SIDEBAR --- */
         nav.sidebar {
-            width: 220px;
-            height: 100%;
-            border-right: 1px solid #eee;
-            padding: 3rem 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-            flex-shrink: 0;
-            background: #fff;
-            z-index: 100;
+            width: 220px; height: 100%; border-right: 1px solid #eee;
+            padding: 3rem 2rem; display: flex; flex-direction: column; gap: 1.2rem;
+            flex-shrink: 0; background: #fff; z-index: 100;
         }
-
         nav.sidebar a {
-            text-decoration: none;
-            color: #aaa;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.12rem;
-            cursor: pointer;
-            transition: color 0.2s;
+            text-decoration: none; color: #aaa; font-size: 0.8rem;
+            text-transform: uppercase; letter-spacing: 0.12rem; cursor: pointer;
         }
-
         nav.sidebar a.active { color: #111; font-weight: 600; }
         .locked { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
-
-        /* --- CONTENT CONTAINER --- */
         main { flex-grow: 1; height: 100%; overflow-y: auto; position: relative; }
         section { display: none; width: 100%; min-height: 100%; background: #fff; }
         section.active { display: block; }
-
-        /* --- HOME: ENVIRONMENTAL SPECTRUM --- */
         #home.active { display: flex; } 
         #home {
-            height: 100vh;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: background-color 3s ease;
-            text-align: center;
-            padding: 0 5%;
-            overflow: hidden; 
+            height: 100vh; flex-direction: column; justify-content: center;
+            align-items: center; transition: background-color 3s ease;
+            text-align: center; padding: 0 5%; overflow: hidden; 
         }
-
         #condition-text { font-size: 4rem; font-weight: 300; letter-spacing: -0.04em; margin-bottom: 1rem; text-transform: capitalize; }
-        
         .algo-desc {
-            position: absolute;
-            bottom: 3.5rem;
-            width: 90%;
-            max-width: 1100px;
-            font-size: 0.95rem;
-            color: rgba(0,0,0,0.5);
-            line-height: 1.4;
+            position: absolute; bottom: 3.5rem; width: 90%; max-width: 1100px;
+            font-size: 0.95rem; color: rgba(0,0,0,0.5); line-height: 1.4;
         }
-
-        /* --- ARCHIVE PAGES --- */
         .page-container { padding: 4rem 10%; max-width: 1000px; }
         .sub-nav { display: flex; gap: 1.5rem; margin-bottom: 3.5rem; border-bottom: 1px solid #eee; padding-bottom: 1rem; }
         .sub-nav span { font-size: 0.75rem; color: #aaa; text-transform: lowercase; }
@@ -85,29 +49,25 @@
     </style>
 </head>
 <body>
-
     <div class="layout">
         <nav class="sidebar">
             <a onclick="route('home')" id="nav-home" class="active">Home</a>
             <a class="locked">Posts</a>
             <a class="locked">Interactive</a>
         </nav>
-
         <main id="main-content">
             <section id="home" class="active">
-                <h1 id="condition-text">Syncing...</h1>
+                <h1 id="condition-text">Atmosphere</h1>
                 <div class="algo-desc">
                     This interface translates your local meteorological data into a visual spectrum: yellow signifies solar clarity and clear skies, while blue represents atmospheric density and overcast conditions.
                 </div>
             </section>
-
             <section id="posts">
                 <div class="page-container">
                     <div class="sub-nav"><span class="active">all</span><span>most popular</span><span>society</span><span>cases</span><span>reviews</span><span>misc</span></div>
                     <div id="posts-list"></div>
                 </div>
             </section>
-
             <section id="interactive">
                 <div class="page-container">
                     <div class="sub-nav"><span class="active">all</span><span>data</span><span>design</span></div>
@@ -123,7 +83,6 @@
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
             if(document.getElementById('nav-' + id)) document.getElementById('nav-' + id).classList.add('active');
-            document.getElementById('main-content').scrollTop = 0;
         }
 
         function getRandomDate() {
@@ -161,6 +120,7 @@
         }
         loadContent();
 
+        // FALLBACK LOGIC: If no key is provided, show a neutral professional state
         const apiKey = 'c879a68af9adfd66fee980f91922a692'; 
 
         function interpolateColor(clouds) {
@@ -171,6 +131,12 @@
         }
 
         function setEnvironment(lat, lon) {
+            if(apiKey === 'YOUR_API_KEY_HERE') {
+                // If you haven't put a key yet, show a clean "Neutral" state
+                document.getElementById('home').style.backgroundColor = "#f7f7f7";
+                document.getElementById('condition-text').innerText = "Neutral";
+                return;
+            }
             fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`)
                 .then(r => r.json())
                 .then(data => {
@@ -179,11 +145,18 @@
                     document.getElementById('condition-text').innerText = data.weather[0].description;
                     document.getElementById('condition-text').style.color = (cloudCover > 60) ? "#fff" : "#111";
                 })
-                .catch(() => { document.getElementById('condition-text').innerText = "Offline"; });
+                .catch(() => { 
+                    document.getElementById('home').style.backgroundColor = "#f7f7f7";
+                    document.getElementById('condition-text').innerText = "Neutral";
+                });
         }
 
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(p => setEnvironment(p.coords.latitude, p.coords.longitude));
+            navigator.geolocation.getCurrentPosition(p => setEnvironment(p.coords.latitude, p.coords.longitude), 
+            () => {
+                document.getElementById('home').style.backgroundColor = "#f7f7f7";
+                document.getElementById('condition-text').innerText = "Neutral";
+            });
         }
     </script>
 </body>

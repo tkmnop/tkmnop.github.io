@@ -28,7 +28,7 @@
             gap: 1.2rem;
             flex-shrink: 0;
             background: #fff;
-            z-index: 10;
+            z-index: 100;
         }
 
         nav.sidebar a {
@@ -51,7 +51,6 @@
             position: relative;
         }
 
-        /* Essential: This ensures sections don't stack or peek through */
         section { 
             display: none; 
             width: 100%;
@@ -61,38 +60,39 @@
         
         section.active { display: block; }
 
-        /* --- HOME: ENVIRONMENTAL INTERFACE --- */
-        #home.active { display: flex; } /* Flex for centering */
+        /* --- HOME: ENVIRONMENTAL SPECTRUM --- */
+        #home.active { display: flex; } 
         #home {
             height: 100vh;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: background-color 2s ease;
+            transition: background-color 3s ease; /* Slower, smoother spectrum shift */
             overflow: hidden; 
             text-align: center;
             padding: 0 5%;
         }
 
-        #weather-statement { 
-            font-size: 3.5rem; 
+        #condition-text { 
+            font-size: 4rem; 
             font-weight: 300; 
-            letter-spacing: -0.03em; 
+            letter-spacing: -0.04em; 
             margin-bottom: 1rem;
+            text-transform: capitalize;
         }
         
         .algo-desc {
             position: absolute;
-            bottom: 3rem;
+            bottom: 3.5rem;
             width: 90%;
-            max-width: 1000px; /* Wide to prevent wrapping */
-            font-size: 0.8rem;
+            max-width: 1100px;
+            font-size: 0.95rem; /* Increased size */
             color: rgba(0,0,0,0.5);
-            line-height: 1.6;
-            letter-spacing: 0.02em;
+            line-height: 1.4;
+            letter-spacing: 0.01em;
         }
 
-        /* --- POSTS & INTERACTIVE (Rickard Style) --- */
+        /* --- ARCHIVE PAGES (Rickard Style) --- */
         .page-container { padding: 4rem 10%; max-width: 1000px; }
         
         .sub-nav {
@@ -113,7 +113,6 @@
 
         .sub-nav span.active, .sub-nav span:hover { color: #111; }
 
-        /* Archive Items */
         .archive-item {
             display: flex;
             padding: 0.7rem 0;
@@ -126,8 +125,6 @@
         .archive-item:hover .title { color: #666; }
         .date { color: #ccc; font-family: monospace; width: 100px; flex-shrink: 0; font-size: 0.85rem; }
         .title { flex-grow: 1; }
-
-        h2 { font-size: 0.7rem; text-transform: uppercase; color: #bbb; letter-spacing: 0.2rem; margin-bottom: 2.5rem; }
 
     </style>
 </head>
@@ -143,9 +140,9 @@
         <main id="main-content">
             
             <section id="home" class="active">
-                <h1 id="weather-statement">Syncing...</h1>
+                <h1 id="condition-text">Connecting...</h1>
                 <div class="algo-desc">
-                    This interface translates local meteorological data into a visual spectrum: yellow signifies solar clarity and clear skies, 
+                    This interface translates your local meteorological data into a visual spectrum: yellow signifies solar clarity and clear skies, 
                     while blue represents atmospheric density and overcast conditions.
                 </div>
             </section>
@@ -166,7 +163,11 @@
 
             <section id="interactive">
                 <div class="page-container">
-                    <h2>Experiments & Prototypes</h2>
+                    <div class="sub-nav">
+                        <span class="active">all</span>
+                        <span>data</span>
+                        <span>design</span>
+                    </div>
                     <div id="int-list"></div>
                 </div>
             </section>
@@ -177,30 +178,26 @@
     <script>
         // 1. ROUTING LOGIC
         function route(id) {
-            // Hide all
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-            // Show target
             document.getElementById(id).classList.add('active');
 
-            // Update Nav Style
             document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
             document.getElementById('nav-' + id).classList.add('active');
 
-            // Reset scroll for the new page
             document.getElementById('main-content').scrollTop = 0;
         }
 
-        // 2. DATA LOAD (Descending Order: Most Recent Top)
+        // 2. DATA LOAD (Descending Date Order)
         function loadContent() {
             const postsList = document.getElementById('posts-list');
             const intList = document.getElementById('int-list');
 
-            // Posts: 20 items (Date 26-04-20 to 26-04-01)
+            // Posts: 20 items (Format: YY-MM-DD)
             for(let i=20; i>=1; i--) {
                 const day = i < 10 ? '0'+i : i;
                 postsList.innerHTML += `
                 <a href="#" class="archive-item">
-                    <span class="date">${day}-04-26</span>
+                    <span class="date">26-04-${day}</span>
                     <span class="title">Paper Title ${i}</span>
                 </a>`;
             }
@@ -210,39 +207,48 @@
                 const day = i < 10 ? '0'+i : i;
                 intList.innerHTML += `
                 <a href="#" class="archive-item">
-                    <span class="date">${day}-04-26</span>
+                    <span class="date">26-04-${day}</span>
                     <span class="title">Interactive Experiment ${i}</span>
                 </a>`;
             }
         }
         loadContent();
 
-        // 3. WEATHER SENSOR
+        // 3. WEATHER SPECTRUM ALGORITHM
         const apiKey = 'c879a68af9adfd66fee980f91922a692'; 
+
+        function interpolateColor(clouds) {
+            // Spectrum logic: 
+            // 0% clouds (Sunny) = HSL(55, 100%, 65%) - Vibrant Yellow
+            // 100% clouds (Gloomy) = HSL(210, 80%, 55%) - Deep Blue
+            // We calculate the hue based on cloud percentage
+            const hue = 55 + (clouds * 1.55); // 55 to 210
+            const saturation = 100 - (clouds * 0.2); // 100% down to 80%
+            const lightness = 65 - (clouds * 0.1); // 65% down to 55%
+            
+            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        }
 
         function setEnvironment(lat, lon) {
             fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`)
                 .then(r => r.json())
                 .then(data => {
-                    const weather = data.weather[0].main.toLowerCase();
+                    const cloudCover = data.clouds.all; // 0 to 100
+                    const condition = data.weather[0].description;
                     const home = document.getElementById('home');
-                    const text = document.getElementById('weather-statement');
+                    const text = document.getElementById('condition-text');
 
-                    if (weather.includes('clear')) {
-                        home.style.backgroundColor = "#FFEB3B"; 
-                        text.innerText = "Atmosphere: Clear";
-                        text.style.color = "#111";
-                    } else if (weather.includes('cloud') || weather.includes('rain')) {
-                        home.style.backgroundColor = "#1E88E5"; 
-                        text.innerText = "Atmosphere: Overcast";
-                        text.style.color = "#fff";
-                    } else {
-                        home.style.backgroundColor = "#fff";
-                        text.innerText = "Atmosphere: Neutral";
-                    }
+                    // Set Spectrum Color
+                    home.style.backgroundColor = interpolateColor(cloudCover);
+                    
+                    // Display specific condition name
+                    text.innerText = condition;
+
+                    // Adjust text contrast for darker blues
+                    text.style.color = (cloudCover > 60) ? "#fff" : "#111";
                 })
                 .catch(() => {
-                    document.getElementById('weather-statement').innerText = "System Offline";
+                    document.getElementById('condition-text').innerText = "Offline";
                 });
         }
 

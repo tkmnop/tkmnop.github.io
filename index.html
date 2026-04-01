@@ -38,12 +38,12 @@
             text-transform: uppercase;
             letter-spacing: 0.12rem;
             cursor: pointer;
-            transition: 0.2s;
+            transition: color 0.2s;
         }
 
         nav.sidebar a.active { color: #111; font-weight: 600; }
         
-        /* Stylized "Coming Soon" for Resume */
+        /* Stealth Mode for Resume */
         .locked { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
 
         /* --- CONTENT CONTAINER --- */
@@ -62,6 +62,7 @@
             transition: background-color 3s ease;
             text-align: center;
             padding: 0 5%;
+            overflow: hidden; /* Strict no-scroll */
         }
 
         #condition-text { font-size: 4rem; font-weight: 300; letter-spacing: -0.04em; margin-bottom: 1rem; text-transform: capitalize; }
@@ -78,20 +79,10 @@
 
         /* --- ARCHIVE PAGES --- */
         .page-container { padding: 4rem 10%; max-width: 1000px; }
-        
-        .sub-nav {
-            display: flex; gap: 1.5rem; margin-bottom: 3.5rem;
-            border-bottom: 1px solid #eee; padding-bottom: 1rem;
-        }
-
+        .sub-nav { display: flex; gap: 1.5rem; margin-bottom: 3.5rem; border-bottom: 1px solid #eee; padding-bottom: 1rem; }
         .sub-nav span { font-size: 0.75rem; color: #aaa; text-transform: lowercase; }
         .sub-nav span.active { color: #111; }
-
-        .archive-item {
-            display: flex; padding: 0.7rem 0; text-decoration: none;
-            color: inherit; font-size: 0.95rem; border-bottom: 1px solid #f9f9f9;
-        }
-
+        .archive-item { display: flex; padding: 0.7rem 0; text-decoration: none; color: inherit; font-size: 0.95rem; border-bottom: 1px solid #f9f9f9; }
         .date { color: #ccc; font-family: monospace; width: 100px; flex-shrink: 0; font-size: 0.85rem; }
         .title { flex-grow: 1; }
     </style>
@@ -110,7 +101,7 @@
                 <h1 id="condition-text">Syncing...</h1>
                 <div class="algo-desc">
                     This interface translates your local meteorological data into a visual spectrum: yellow signifies solar clarity and clear skies, 
-                    while blue represents atmospheric density and overcast conditions. The archive is currently being indexed for the 2026 academic cycle.
+                    while blue represents atmospheric density and overcast conditions.
                 </div>
             </section>
 
@@ -139,29 +130,24 @@
             document.getElementById('main-content').scrollTop = 0;
         }
 
-        // RANDOM DATE GENERATOR (2022 - 2026 March)
         function getRandomDate() {
             const start = new Date(2022, 0, 1).getTime();
-            const end = new Date(2026, 2, 31).getTime(); // March 31, 2026
+            const end = new Date(2026, 2, 31).getTime(); 
             const randomDate = new Date(start + Math.random() * (end - start));
-            
             let yy = randomDate.getFullYear().toString().slice(-2);
             let mm = (randomDate.getMonth() + 1).toString().padStart(2, '0');
             let dd = randomDate.getDate().toString().padStart(2, '0');
-            
             return { string: `${yy}-${mm}-${dd}`, time: randomDate.getTime() };
         }
 
         function loadContent() {
             const postsList = document.getElementById('posts-list');
             const intList = document.getElementById('int-list');
-
             let posts = [];
             for(let i=1; i<=20; i++) {
                 let d = getRandomDate();
                 posts.push({ date: d.string, time: d.time, title: `Paper Title ${i}` });
             }
-            // Sort Descending (Newest first)
             posts.sort((a,b) => b.time - a.time);
             posts.forEach(p => {
                 postsList.innerHTML += `<a href="#" class="archive-item"><span class="date">${p.date}</span><span class="title">${p.title}</span></a>`;
@@ -179,7 +165,6 @@
         }
         loadContent();
 
-        // WEATHER LOGIC
         const apiKey = 'c879a68af9adfd66fee980f91922a692'; 
 
         function interpolateColor(clouds) {

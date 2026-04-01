@@ -17,7 +17,7 @@
 
         .layout { display: flex; height: 100vh; width: 100vw; }
 
-        /* --- SIDEBAR (McGillick Style) --- */
+        /* --- SIDEBAR --- */
         nav.sidebar {
             width: 220px;
             height: 100%;
@@ -38,26 +38,18 @@
             text-transform: uppercase;
             letter-spacing: 0.12rem;
             cursor: pointer;
-            transition: color 0.2s;
+            transition: 0.2s;
         }
 
         nav.sidebar a.active { color: #111; font-weight: 600; }
+        
+        /* Stylized "Coming Soon" for Resume */
+        .locked { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
 
         /* --- CONTENT CONTAINER --- */
-        main {
-            flex-grow: 1;
-            height: 100%;
-            overflow-y: auto; 
-            position: relative;
-        }
+        main { flex-grow: 1; height: 100%; overflow-y: auto; position: relative; }
 
-        section { 
-            display: none; 
-            width: 100%;
-            min-height: 100%; 
-            background: #fff; 
-        }
-        
+        section { display: none; width: 100%; min-height: 100%; background: #fff; }
         section.active { display: block; }
 
         /* --- HOME: ENVIRONMENTAL SPECTRUM --- */
@@ -67,65 +59,41 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: background-color 3s ease; /* Slower, smoother spectrum shift */
-            overflow: hidden; 
+            transition: background-color 3s ease;
             text-align: center;
             padding: 0 5%;
         }
 
-        #condition-text { 
-            font-size: 4rem; 
-            font-weight: 300; 
-            letter-spacing: -0.04em; 
-            margin-bottom: 1rem;
-            text-transform: capitalize;
-        }
+        #condition-text { font-size: 4rem; font-weight: 300; letter-spacing: -0.04em; margin-bottom: 1rem; text-transform: capitalize; }
         
         .algo-desc {
             position: absolute;
             bottom: 3.5rem;
             width: 90%;
             max-width: 1100px;
-            font-size: 0.95rem; /* Increased size */
+            font-size: 0.95rem;
             color: rgba(0,0,0,0.5);
             line-height: 1.4;
-            letter-spacing: 0.01em;
         }
 
-        /* --- ARCHIVE PAGES (Rickard Style) --- */
+        /* --- ARCHIVE PAGES --- */
         .page-container { padding: 4rem 10%; max-width: 1000px; }
         
         .sub-nav {
-            display: flex;
-            gap: 1.5rem;
-            margin-bottom: 3.5rem;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 1rem;
+            display: flex; gap: 1.5rem; margin-bottom: 3.5rem;
+            border-bottom: 1px solid #eee; padding-bottom: 1rem;
         }
 
-        .sub-nav span {
-            font-size: 0.75rem;
-            color: #aaa;
-            cursor: pointer;
-            text-transform: lowercase;
-            letter-spacing: 0.05em;
-        }
-
-        .sub-nav span.active, .sub-nav span:hover { color: #111; }
+        .sub-nav span { font-size: 0.75rem; color: #aaa; text-transform: lowercase; }
+        .sub-nav span.active { color: #111; }
 
         .archive-item {
-            display: flex;
-            padding: 0.7rem 0;
-            text-decoration: none;
-            color: inherit;
-            font-size: 0.95rem;
-            border-bottom: 1px solid #f9f9f9;
+            display: flex; padding: 0.7rem 0; text-decoration: none;
+            color: inherit; font-size: 0.95rem; border-bottom: 1px solid #f9f9f9;
         }
 
-        .archive-item:hover .title { color: #666; }
         .date { color: #ccc; font-family: monospace; width: 100px; flex-shrink: 0; font-size: 0.85rem; }
         .title { flex-grow: 1; }
-
     </style>
 </head>
 <body>
@@ -133,99 +101,91 @@
     <div class="layout">
         <nav class="sidebar">
             <a onclick="route('home')" id="nav-home" class="active">Home</a>
-            <a onclick="route('posts')" id="nav-posts">Posts</a>
-            <a onclick="route('interactive')" id="nav-interactive">Interactive</a>
+            <a class="locked">Posts</a>
+            <a class="locked">Interactive</a>
         </nav>
 
         <main id="main-content">
-            
             <section id="home" class="active">
-                <h1 id="condition-text">Connecting...</h1>
+                <h1 id="condition-text">Syncing...</h1>
                 <div class="algo-desc">
                     This interface translates your local meteorological data into a visual spectrum: yellow signifies solar clarity and clear skies, 
-                    while blue represents atmospheric density and overcast conditions.
+                    while blue represents atmospheric density and overcast conditions. The archive is currently being indexed for the 2026 academic cycle.
                 </div>
             </section>
 
             <section id="posts">
                 <div class="page-container">
-                    <div class="sub-nav">
-                        <span class="active">all</span>
-                        <span>most popular</span>
-                        <span>society</span>
-                        <span>cases</span>
-                        <span>reviews</span>
-                        <span>misc</span>
-                    </div>
+                    <div class="sub-nav"><span class="active">all</span><span>most popular</span><span>society</span><span>cases</span><span>reviews</span><span>misc</span></div>
                     <div id="posts-list"></div>
                 </div>
             </section>
 
             <section id="interactive">
                 <div class="page-container">
-                    <div class="sub-nav">
-                        <span class="active">all</span>
-                        <span>data</span>
-                        <span>design</span>
-                    </div>
+                    <div class="sub-nav"><span class="active">all</span><span>data</span><span>design</span></div>
                     <div id="int-list"></div>
                 </div>
             </section>
-
         </main>
     </div>
 
     <script>
-        // 1. ROUTING LOGIC
         function route(id) {
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-
             document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-            document.getElementById('nav-' + id).classList.add('active');
-
+            if(document.getElementById('nav-' + id)) document.getElementById('nav-' + id).classList.add('active');
             document.getElementById('main-content').scrollTop = 0;
         }
 
-        // 2. DATA LOAD (Descending Date Order)
+        // RANDOM DATE GENERATOR (2022 - 2026 March)
+        function getRandomDate() {
+            const start = new Date(2022, 0, 1).getTime();
+            const end = new Date(2026, 2, 31).getTime(); // March 31, 2026
+            const randomDate = new Date(start + Math.random() * (end - start));
+            
+            let yy = randomDate.getFullYear().toString().slice(-2);
+            let mm = (randomDate.getMonth() + 1).toString().padStart(2, '0');
+            let dd = randomDate.getDate().toString().padStart(2, '0');
+            
+            return { string: `${yy}-${mm}-${dd}`, time: randomDate.getTime() };
+        }
+
         function loadContent() {
             const postsList = document.getElementById('posts-list');
             const intList = document.getElementById('int-list');
 
-            // Posts: 20 items (Format: YY-MM-DD)
-            for(let i=20; i>=1; i--) {
-                const day = i < 10 ? '0'+i : i;
-                postsList.innerHTML += `
-                <a href="#" class="archive-item">
-                    <span class="date">26-04-${day}</span>
-                    <span class="title">Paper Title ${i}</span>
-                </a>`;
+            let posts = [];
+            for(let i=1; i<=20; i++) {
+                let d = getRandomDate();
+                posts.push({ date: d.string, time: d.time, title: `Paper Title ${i}` });
             }
+            // Sort Descending (Newest first)
+            posts.sort((a,b) => b.time - a.time);
+            posts.forEach(p => {
+                postsList.innerHTML += `<a href="#" class="archive-item"><span class="date">${p.date}</span><span class="title">${p.title}</span></a>`;
+            });
 
-            // Interactive: 10 items
-            for(let i=10; i>=1; i--) {
-                const day = i < 10 ? '0'+i : i;
-                intList.innerHTML += `
-                <a href="#" class="archive-item">
-                    <span class="date">26-04-${day}</span>
-                    <span class="title">Interactive Experiment ${i}</span>
-                </a>`;
+            let items = [];
+            for(let i=1; i<=10; i++) {
+                let d = getRandomDate();
+                items.push({ date: d.string, time: d.time, title: `Interactive Experiment ${i}` });
             }
+            items.sort((a,b) => b.time - a.time);
+            items.forEach(p => {
+                intList.innerHTML += `<a href="#" class="archive-item"><span class="date">${p.date}</span><span class="title">${p.title}</span></a>`;
+            });
         }
         loadContent();
 
-        // 3. WEATHER SPECTRUM ALGORITHM
+        // WEATHER LOGIC
         const apiKey = 'c879a68af9adfd66fee980f91922a692'; 
 
         function interpolateColor(clouds) {
-            // Spectrum logic: 
-            // 0% clouds (Sunny) = HSL(55, 100%, 65%) - Vibrant Yellow
-            // 100% clouds (Gloomy) = HSL(210, 80%, 55%) - Deep Blue
-            // We calculate the hue based on cloud percentage
-            const hue = 55 + (clouds * 1.55); // 55 to 210
-            const saturation = 100 - (clouds * 0.2); // 100% down to 80%
-            const lightness = 65 - (clouds * 0.1); // 65% down to 55%
-            
+            const hue = 55 + (clouds * 1.55);
+            const saturation = 100 - (clouds * 0.2);
+            const lightness = 65 - (clouds * 0.1);
             return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
         }
 
@@ -233,23 +193,12 @@
             fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`)
                 .then(r => r.json())
                 .then(data => {
-                    const cloudCover = data.clouds.all; // 0 to 100
-                    const condition = data.weather[0].description;
-                    const home = document.getElementById('home');
-                    const text = document.getElementById('condition-text');
-
-                    // Set Spectrum Color
-                    home.style.backgroundColor = interpolateColor(cloudCover);
-                    
-                    // Display specific condition name
-                    text.innerText = condition;
-
-                    // Adjust text contrast for darker blues
-                    text.style.color = (cloudCover > 60) ? "#fff" : "#111";
+                    const cloudCover = data.clouds.all;
+                    document.getElementById('home').style.backgroundColor = interpolateColor(cloudCover);
+                    document.getElementById('condition-text').innerText = data.weather[0].description;
+                    document.getElementById('condition-text').style.color = (cloudCover > 60) ? "#fff" : "#111";
                 })
-                .catch(() => {
-                    document.getElementById('condition-text').innerText = "Offline";
-                });
+                .catch(() => { document.getElementById('condition-text').innerText = "Offline"; });
         }
 
         if (navigator.geolocation) {

@@ -3,202 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio | Environmental Interface</title>
+    <title>Portfolio | Academic Archive</title>
     <style>
-        /* --- GLOBAL RESET & TYPOGRAPHY --- */
+        /* --- CORE SYSTEM --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html { 
             height: 100%; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #fff;
             color: #111;
-            overflow: hidden; /* We handle scrolling in the content area */
+            overflow: hidden; /* Prevents global scrolling */
         }
 
-        /* --- MAIN LAYOUT --- */
-        .wrapper { display: flex; height: 100vh; width: 100vw; }
+        .layout { display: flex; height: 100vh; width: 100vw; }
 
-        /* --- SIDEBAR (McGillick Style) --- */
-        nav {
-            width: 280px;
+        /* --- SIDEBAR (McGillick Style: No Title) --- */
+        nav.sidebar {
+            width: 240px;
             height: 100%;
             border-right: 1px solid #eee;
+            padding: 3rem 2rem;
             display: flex;
             flex-direction: column;
-            padding: 2rem;
+            gap: 1.2rem;
             flex-shrink: 0;
-            background: white;
         }
 
-        .site-title { font-weight: 700; font-size: 1.2rem; margin-bottom: 3rem; text-transform: uppercase; letter-spacing: 0.1rem; }
-
-        .nav-links { display: flex; flex-direction: column; gap: 1rem; }
-
-        .nav-links a {
+        nav.sidebar a {
             text-decoration: none;
-            color: #888;
-            font-size: 0.9rem;
+            color: #999;
+            font-size: 0.85rem;
             text-transform: uppercase;
-            letter-spacing: 0.05rem;
+            letter-spacing: 0.1rem;
             cursor: pointer;
-            transition: color 0.2s;
+            transition: 0.2s;
         }
 
-        .nav-links a:hover, .nav-links a.active-link { color: #111; }
+        nav.sidebar a.active { color: #111; font-weight: 600; }
 
-        /* --- CONTENT AREA (Rickard Style) --- */
+        /* --- MAIN CONTENT AREA --- */
         main {
             flex-grow: 1;
             height: 100%;
-            overflow-y: auto;
+            overflow-y: auto; /* Content scrolls, sidebar stays */
             position: relative;
         }
 
-        section { display: none; padding: 4rem 10%; min-height: 100%; }
+        section { display: none; min-height: 100%; }
         section.active { display: block; }
 
-        /* --- HOME: THE SMART SCREEN --- */
+        /* --- HOME: THE SMART SCREEN (No Scrolling) --- */
         #home {
-            padding: 0; /* Full bleed */
+            height: 100vh;
+            width: 100%;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
-            background-color: #f7f7f7; /* Default fallback */
-            transition: background-color 2s ease-in-out;
+            align-items: center;
+            transition: background-color 2s ease;
+            position: relative;
+            overflow: hidden; /* Strictly no scrolling */
         }
 
-        .weather-message {
-            max-width: 500px;
+        #weather-statement { font-size: 2.5rem; font-weight: 300; letter-spacing: -0.02em; }
+        
+        .algo-desc {
+            position: absolute;
+            bottom: 2rem;
+            max-width: 400px;
             text-align: center;
-            padding: 2rem;
+            font-size: 0.75rem;
+            color: rgba(0,0,0,0.4);
+            line-height: 1.5;
+            padding: 0 20px;
         }
 
-        /* --- ARCHIVE LISTS (Rickard Style) --- */
-        .archive-list { max-width: 800px; margin-top: 2rem; }
-        .archive-item { 
-            display: flex; 
-            justify-content: space-between; 
-            padding: 1rem 0; 
-            border-bottom: 1px solid #f0f0f0; 
-            text-decoration: none; 
+        /* --- POSTS & INTERACTIVE (Rickard Style) --- */
+        .page-container { padding: 4rem 8%; max-width: 900px; }
+        
+        /* Sub-Nav for Categories */
+        .sub-nav {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+        }
+
+        .sub-nav span {
+            font-size: 0.8rem;
+            color: #999;
+            cursor: pointer;
+            text-transform: lowercase;
+        }
+
+        .sub-nav span:hover, .sub-nav span.active { color: #111; text-decoration: underline; }
+
+        /* Archive Listing */
+        .archive-item {
+            display: flex;
+            gap: 2rem;
+            padding: 0.6rem 0;
+            text-decoration: none;
             color: inherit;
+            font-size: 0.95rem;
+            border-bottom: 1px solid #fafafa;
         }
-        .archive-item:hover { background-color: #fafafa; }
-        .archive-title { font-weight: 500; }
-        .archive-date { color: #999; font-family: monospace; font-size: 0.85rem; }
 
-        h2 { font-size: 0.8rem; text-transform: uppercase; color: #999; letter-spacing: 0.2rem; margin-bottom: 2rem; }
+        .archive-item:hover .title { text-decoration: underline; }
+        .date { color: #bbb; font-family: monospace; width: 80px; flex-shrink: 0; }
+        .title { flex-grow: 1; }
 
     </style>
 </head>
 <body>
 
-    <div class="wrapper">
-        <nav>
-            <div class="site-title">Archive.01</div>
-            <div class="nav-links">
-                <a onclick="showPage('home')" id="link-home" class="active-link">Home</a>
-                <a onclick="showPage('posts')" id="link-posts">Posts</a>
-                <a onclick="showPage('interactive')" id="link-interactive">Interactive</a>
-            </div>
+    <div class="layout">
+        <nav class="sidebar">
+            <a onclick="route('home')" id="nav-home">Home</a>
+            <a onclick="route('posts')" id="nav-posts">Posts</a>
+            <a onclick="route('interactive')" id="nav-interactive">Interactive</a>
         </nav>
 
-        <main>
+        <main id="main-content">
+            
             <section id="home" class="active">
-                <div class="weather-message">
-                    <h1 id="weather-status" style="font-size: 3rem; font-weight: 300; line-height: 1.1;">Calibrating sensor...</h1>
-                    <p id="location-name" style="margin-top: 1.5rem; font-family: monospace; opacity: 0.5;">REQUESTING COORDINATES</p>
+                <h1 id="weather-statement">Analyzing environment...</h1>
+                <div class="algo-desc">
+                    This interface functions as a real-time environmental sensor. By translating regional meteorological data into a minimal color field, it bridges the gap between digital space and physical atmosphere.
                 </div>
             </section>
 
             <section id="posts">
-                <h2>Writing & Research</h2>
-                <div id="post-list" class="archive-list">
+                <div class="page-container">
+                    <div class="sub-nav">
+                        <span class="active">all</span>
+                        <span>most popular</span>
+                        <span>society</span>
+                        <span>cases</span>
+                        <span>reviews</span>
+                        <span>misc</span>
                     </div>
+                    <div id="posts-list">
+                        </div>
+                </div>
             </section>
 
             <section id="interactive">
-                <h2>Computational Experiments</h2>
-                <div id="int-list" class="archive-list">
-                    </div>
+                <div class="page-container">
+                    <div id="int-list">
+                        </div>
+                </div>
             </section>
+
         </main>
     </div>
 
     <script>
-        // 1. NAVIGATION LOGIC (The Page Swapper)
-        function showPage(id) {
-            // Hide all sections
+        // 1. NAVIGATION & ROUTING
+        function route(id) {
+            // Update Visibility
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-            // Show selected section
             document.getElementById(id).classList.add('active');
-            
-            // Update nav link styling
-            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active-link'));
-            document.getElementById('link-' + id).classList.add('active-link');
+
+            // Update Sidebar UI
+            document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
+            document.getElementById('nav-' + id).classList.add('active');
+
+            // Reset Scroll position
+            document.getElementById('main-content').scrollTop = 0;
         }
 
-        // 2. GENERATE ARCHIVE LISTS (Rickard Style)
-        function generateArchives() {
-            const postList = document.getElementById('post-list');
+        // 2. DATA GENERATION (Placeholders)
+        function loadContent() {
+            const postsList = document.getElementById('posts-list');
             const intList = document.getElementById('int-list');
 
-            for (let i = 1; i <= 20; i++) {
-                postList.innerHTML += `
-                    <a href="#" class="archive-item">
-                        <span class="archive-title">Research Log / Entry ${21-i}</span>
-                        <span class="archive-date">APR ${i < 10 ? '0'+i : i} '26</span>
-                    </a>`;
+            // Generate 20 Posts (Format: 26-01-20)
+            for(let i=1; i<=20; i++) {
+                postsList.innerHTML += `
+                <a href="your-post-link-here.html" class="archive-item">
+                    <span class="date">26-04-${i < 10 ? '0'+i : i}</span>
+                    <span class="title">Sample Academic Research Paper Title ${21-i}</span>
+                </a>`;
             }
 
-            for (let i = 1; i <= 10; i++) {
+            // Generate 10 Interactive
+            for(let i=1; i<=10; i++) {
                 intList.innerHTML += `
-                    <a href="#" class="archive-item">
-                        <span class="archive-title">Protocol Beta-0${i}</span>
-                        <span class="archive-date">RUNTIME_ERROR_0${i}</span>
-                    </a>`;
+                <a href="your-interactive-link.html" class="archive-item">
+                    <span class="date">26-04-${i < 10 ? '0'+i : i}</span>
+                    <span class="title">Interactive Data Visualization Experiment ${i}</span>
+                </a>`;
             }
         }
-        generateArchives();
+        loadContent();
 
-        // 3. WEATHER LOGIC (The Smart Interface)
-        // !IMPORTANT: PASTE YOUR KEY HERE
+        // 3. WEATHER ALGORITHM
+        // PASTE YOUR KEY HERE
         const apiKey = 'c879a68af9adfd66fee980f91922a692'; 
 
-        function updateWeather(lat, lon) {
+        function setEnvironment(lat, lon) {
             fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`)
-                .then(res => res.json())
+                .then(r => r.json())
                 .then(data => {
-                    const mainWeather = data.weather[0].main.toLowerCase();
-                    const statusText = document.getElementById('weather-status');
-                    const locationText = document.getElementById('location-name');
-                    const homeSection = document.getElementById('home');
+                    const weather = data.weather[0].main.toLowerCase();
+                    const home = document.getElementById('home');
+                    const text = document.getElementById('weather-statement');
 
-                    locationText.innerText = `LOC: ${data.name.toUpperCase()} / LAT: ${lat.toFixed(2)}`;
-
-                    if (mainWeather.includes('clear')) {
-                        homeSection.style.backgroundColor = "#FFEB3B"; // Sunny Yellow
-                        statusText.innerText = "The sky is clear.";
-                    } else if (mainWeather.includes('rain') || mainWeather.includes('cloud') || mainWeather.includes('drizzle')) {
-                        homeSection.style.backgroundColor = "#2196F3"; // Gloomy Blue
-                        statusText.innerText = "The atmosphere is heavy.";
-                        statusText.style.color = "white"; // Better contrast for blue
+                    if (weather.includes('clear')) {
+                        home.style.backgroundColor = "#FFF176"; // Direct Sunny Yellow
+                        text.innerText = "It is sunny.";
+                        text.style.color = "#111";
+                    } else if (weather.includes('cloud') || weather.includes('rain') || weather.includes('drizzle')) {
+                        home.style.backgroundColor = "#1E88E5"; // Direct Gloomy Blue
+                        text.innerText = "It is gloomy.";
+                        text.style.color = "#fff";
                     } else {
-                        homeSection.style.backgroundColor = "#eeeeee"; // Neutral gray
-                        statusText.innerText = "The air is still.";
+                        home.style.backgroundColor = "#f0f0f0";
+                        text.innerText = "The air is neutral.";
                     }
                 })
-                .catch(err => {
-                    document.getElementById('weather-status').innerText = "Sensor Offline.";
+                .catch(() => {
+                    document.getElementById('weather-statement').innerText = "Environment Offline.";
                 });
         }
 
-        // Get User Location
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                p => updateWeather(p.coords.latitude, p.coords.longitude),
-                () => { document.getElementById('weather-status').innerText = "Location Denied."; }
-            );
+            navigator.geolocation.getCurrentPosition(p => setEnvironment(p.coords.latitude, p.coords.longitude));
         }
     </script>
 </body>

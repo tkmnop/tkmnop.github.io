@@ -42,13 +42,10 @@
         }
 
         nav.sidebar a.active { color: #111; font-weight: 600; }
-        
-        /* Stealth Mode for Resume */
         .locked { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
 
         /* --- CONTENT CONTAINER --- */
         main { flex-grow: 1; height: 100%; overflow-y: auto; position: relative; }
-
         section { display: none; width: 100%; min-height: 100%; background: #fff; }
         section.active { display: block; }
 
@@ -100,8 +97,7 @@
             <section id="home" class="active">
                 <h1 id="condition-text">Syncing...</h1>
                 <div class="algo-desc">
-                    This interface translates your local meteorological data into a visual spectrum: yellow signifies solar clarity and clear skies, 
-                    while blue represents atmospheric density and overcast conditions.
+                    This interface translates your local meteorological data into a visual spectrum: yellow signifies solar clarity and clear skies, while blue represents atmospheric density and overcast conditions.
                 </div>
             </section>
 
@@ -130,7 +126,6 @@
             document.getElementById('main-content').scrollTop = 0;
         }
 
-        // BACKDATED ARCHIVE GENERATOR
         function getRandomDate() {
             const start = new Date(2022, 0, 1).getTime();
             const end = new Date(2026, 2, 31).getTime(); 
@@ -166,7 +161,6 @@
         }
         loadContent();
 
-        // WEATHER LOGIC
         const apiKey = 'YOUR_API_KEY_HERE'; 
 
         function interpolateColor(clouds) {

@@ -62,7 +62,7 @@
             transition: background-color 3s ease;
             text-align: center;
             padding: 0 5%;
-            overflow: hidden; /* Strict no-scroll */
+            overflow: hidden; 
         }
 
         #condition-text { font-size: 4rem; font-weight: 300; letter-spacing: -0.04em; margin-bottom: 1rem; text-transform: capitalize; }
@@ -130,6 +130,7 @@
             document.getElementById('main-content').scrollTop = 0;
         }
 
+        // BACKDATED ARCHIVE GENERATOR
         function getRandomDate() {
             const start = new Date(2022, 0, 1).getTime();
             const end = new Date(2026, 2, 31).getTime(); 
@@ -165,7 +166,8 @@
         }
         loadContent();
 
-        const apiKey = 'c879a68af9adfd66fee980f91922a692'; 
+        // WEATHER LOGIC
+        const apiKey = 'YOUR_API_KEY_HERE'; 
 
         function interpolateColor(clouds) {
             const hue = 55 + (clouds * 1.55);
